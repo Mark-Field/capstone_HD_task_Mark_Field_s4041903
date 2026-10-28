@@ -10,6 +10,8 @@ import { cn } from '@/lib/utils'
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/showcase/walk-demo', label: 'Walk Demo' },
+  { href: '/showcase/interaction-demo', label: 'Interaction Demo' },
+  { href: '/showcase/pathing-demo', label: 'Pathing Demo' },
 ] as const
 
 function isActive(pathname: string, href: string) {
@@ -38,7 +40,7 @@ export function SiteNavbar() {
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map(({ href, label }) => {
             const active = isActive(pathname, href)
             return (
@@ -61,7 +63,7 @@ export function SiteNavbar() {
           })}
         </ul>
 
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <Link
             href="/auth/signin"
             className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:border-brand hover:text-white"
@@ -73,7 +75,7 @@ export function SiteNavbar() {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-300 hover:bg-white/10 md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-300 hover:bg-white/10 lg:hidden"
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
           aria-controls="mobile-nav"
@@ -83,7 +85,7 @@ export function SiteNavbar() {
       </nav>
 
       {open && (
-        <ul id="mobile-nav" className="space-y-1 border-t border-white/10 px-4 py-3 md:hidden">
+        <ul id="mobile-nav" className="space-y-1 border-t border-white/10 px-4 py-3 lg:hidden">
           {[...NAV_LINKS, { href: '/auth/signin', label: 'Team sign in' }].map(({ href, label }) => {
             const active = isActive(pathname, href)
             return (

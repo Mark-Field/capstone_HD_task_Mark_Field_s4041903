@@ -93,7 +93,7 @@ Everything a feature build needs already exists below. **Do not survey the codeb
 
 ### Existing routes/pages
 
-Pages: `/` · `/showcase/walk-demo` · `/auth/signin` · `/auth/signup` · `/dashboard` · `/profile` · `/settings` (route groups `(public)`, `(auth)`, `(dashboard)`). Backend: `GET /api/health` (public); everything else under `/api` requires `Authorization: Bearer <ID token>`.
+Pages: `/` · `/showcase/walk-demo` · `/showcase/interaction-demo` · `/showcase/pathing-demo` · `/auth/signin` · `/auth/signup` · `/dashboard` · `/profile` · `/settings` (route groups `(public)`, `(auth)`, `(dashboard)`). Backend: `GET /api/health` (public); everything else under `/api` requires `Authorization: Bearer <ID token>`.
 
 ---
 
