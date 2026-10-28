@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/showcase/walk-demo', label: 'Walk Demo' },
+  { href: '/showcase/interaction-demo', label: 'Interaction Demo' },
 ] as const
 
 function isActive(pathname: string, href: string) {
