@@ -18,49 +18,99 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 
 async function syncUserProfile(user: User): Promise<UserProfile> {
   const profileRef = doc(getClientDb(), 'users', user.uid)
-  const snap = await getDoc(profileRef)
+  console.log('sync uid:', user.uid, 'project:', getClientDb().app.options.projectId)
+
+  let snap
+  try {
+    snap = await getDoc(profileRef)
+  } catch (e) {
+    console.error('STEP 1 getDoc failed', e)
+    throw e
+  }
+  console.log('STEP 1 ok, exists:', snap.exists(), snap.data())
 
   if (!snap.exists()) {
-    const newProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {
-      uid: user.uid,
-      email: user.email ?? '',
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-      role: 'user',
-      _schemaVersion: 1,
+    try {
+      await setDoc(profileRef, {
+        uid: user.uid,
+        email: user.email ?? '',
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        role: 'user',
+        _schemaVersion: 1,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      })
+    } catch (e) {
+      console.error('STEP 2 create failed', e)
+      throw e
     }
-    await setDoc(profileRef, {
-      ...newProfile,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    })
     const createdSnap = await getDoc(profileRef)
-    if (!createdSnap.exists()) {
-      throw new Error('Failed to create user profile document')
-    }
     return createdSnap.data() as UserProfile
   }
 
   const existing = snap.data() as UserProfile
 
   if (!existing.displayName && user.displayName) {
-    await setDoc(
-      profileRef,
-      {
-        displayName: user.displayName,
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    )
-
-    return {
-      ...existing,
-      displayName: user.displayName,
+    try {
+      await setDoc(
+        profileRef,
+        { displayName: user.displayName, updatedAt: serverTimestamp() },
+        { merge: true }
+      )
+      return { ...existing, displayName: user.displayName }
+    } catch (e) {
+      console.warn('STEP 3 displayName backfill failed (non-fatal)', e)
     }
   }
 
   return existing
 }
+// async function syncUserProfile(user: User): Promise<UserProfile> {
+//   const profileRef = doc(getClientDb(), 'users', user.uid)
+//   const snap = await getDoc(profileRef)
+
+//   if (!snap.exists()) {
+//     const newProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {
+//       uid: user.uid,
+//       email: user.email ?? '',
+//       displayName: user.displayName,
+//       photoURL: user.photoURL,
+//       role: 'user',
+//       _schemaVersion: 1,
+//     }
+//     await setDoc(profileRef, {
+//       ...newProfile,
+//       createdAt: serverTimestamp(),
+//       updatedAt: serverTimestamp(),
+//     })
+//     const createdSnap = await getDoc(profileRef)
+//     if (!createdSnap.exists()) {
+//       throw new Error('Failed to create user profile document')
+//     }
+//     return createdSnap.data() as UserProfile
+//   }
+
+//   const existing = snap.data() as UserProfile
+
+//   if (!existing.displayName && user.displayName) {
+//     await setDoc(
+//       profileRef,
+//       {
+//         displayName: user.displayName,
+//         updatedAt: serverTimestamp(),
+//       },
+//       { merge: true }
+//     )
+
+//     return {
+//       ...existing,
+//       displayName: user.displayName,
+//     }
+//   }
+
+//   return existing
+// }
 
 async function setSessionCookie(): Promise<void> {
   const token = await getIdToken()
@@ -82,26 +132,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const auth = getClientAuth()
+    const db = getClientDb()
+    console.log('projectId:', db.app.options.projectId)
+    console.log('authDomain:', auth.app.options.authDomain)
+    console.log('db id:', (db as any)._databaseId?.database)
+    console.log('current user uid:', auth.currentUser?.uid)
+
+    getDoc(doc(db, 'users', auth.currentUser?.uid ?? 'none'))
+      .then(s => console.log('profile exists:', s.exists(), s.data()))
+      .catch(e => console.error('Firestore error:', e.code, e.message))
+      
     const unsubscribe = onAuthStateChanged(getClientAuth(), async (firebaseUser) => {
-      if (firebaseUser) {
-        // Treat unverified users as unauthenticated so they cannot access
-        // protected routes or receive a session cookie before verifying.
-        if (!firebaseUser.emailVerified) {
+      try {
+        if (firebaseUser) {
+          const userProfile = await syncUserProfile(firebaseUser)
+          setUser(firebaseUser)
+          setProfile(userProfile)
+          await setSessionCookie()
+        } else {
           setUser(null)
           setProfile(null)
-          setLoading(false)
-          return
+          await clearSessionCookie()
         }
-        setUser(firebaseUser)
-        const userProfile = await syncUserProfile(firebaseUser)
-        setProfile(userProfile)
-        await setSessionCookie()
-      } else {
+      } catch (err) {
+        console.error('Auth sync failed:', err)
         setUser(null)
         setProfile(null)
-        await clearSessionCookie()
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     })
 
     return () => unsubscribe()
