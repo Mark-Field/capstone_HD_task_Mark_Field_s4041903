@@ -70,6 +70,8 @@ Everything a feature build needs already exists below. **Do not survey the codeb
 | `frontend/src/lib/validations/` | `loginSchema`, `signupSchema`, `registerSchema`, `resetPasswordSchema` (`auth.ts`) · `idSchema`, `paginationSchema` (`common.ts`) | Zod schemas — add feature schemas here or in the feature folder |
 | `frontend/src/lib/utils.ts` | `cn()`, `formatDate`, `formatDatetime`, `truncate` | Class merging, formatting |
 | `frontend/src/components/layout/` | `DashboardShell`, `Sidebar` (navItems array — add links here), `Navbar`, `PageHeader` | App shell |
+| `frontend/src/components/layout/SiteNavbar.tsx` | `SiteNavbar` (`NAV_LINKS` array — add public links here) | Public site nav, used by `app/(public)/layout.tsx` |
+| `frontend/src/features/showcase/components/DemoVideo.tsx` | `DemoVideo { src, caption }` (no autoplay, fallback on error) | Showcase video embeds |
 | `frontend/src/components/shared/` | `ErrorBoundary`, `LoadingSpinner`, `FullPageSpinner`, `EmptyState { title, description?, icon?, action? }` | Loading/empty/error states |
 | `frontend/src/app/api/auth/session/route.ts` | POST (token → `__session` cookie), DELETE | Already wired — don't touch for features |
 
@@ -91,7 +93,7 @@ Everything a feature build needs already exists below. **Do not survey the codeb
 
 ### Existing routes/pages
 
-Pages: `/` · `/auth/signin` · `/auth/signup` · `/dashboard` · `/profile` · `/settings` (route groups `(auth)`, `(dashboard)`). Backend: `GET /api/health` (public); everything else under `/api` requires `Authorization: Bearer <ID token>`.
+Pages: `/` · `/showcase/walk-demo` · `/auth/signin` · `/auth/signup` · `/dashboard` · `/profile` · `/settings` (route groups `(public)`, `(auth)`, `(dashboard)`). Backend: `GET /api/health` (public); everything else under `/api` requires `Authorization: Bearer <ID token>`.
 
 ---
 
