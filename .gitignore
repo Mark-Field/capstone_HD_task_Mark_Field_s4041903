@@ -51,6 +51,7 @@ Thumbs.db
 service-account.json
 docs/BOILERPLATE-COMPARISON.md
 docs/BOILERPLATE-BENCHMARK.md
+.task_notes/
 
 # Microsoft Office lock files
 ~$*
