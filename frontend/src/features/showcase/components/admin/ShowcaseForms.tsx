@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createDemo, createMedia, updateDemo, updateMedia } from '../../actions/showcase.actions'
+import { createDemoPage } from '../../actions/demo-page.actions'
 import { mediaSourceToInput } from '../../lib/parseMediaSource'
 import { serializeSections } from '../../lib/sections'
 import type { DemoFormInput, MediaFormInput } from '../../schemas'
@@ -63,6 +64,64 @@ function useFormSubmit(onDone: () => void) {
 }
 
 const SECTIONS_HINT = '"## Heading" starts a section. "- text" is a bullet, "1. text" a numbered step, other lines are paragraphs.'
+
+const PAGE_TEMPLATE = `import type { Metadata } from 'next'
+import { DemoVideo } from '@/features/showcase/components/DemoVideo'
+
+export const metadata: Metadata = {
+  title: 'My Demo',
+}
+
+export default function MyDemoPage() {
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">My Demo</h1>
+      <p className="mt-4 text-lg text-zinc-400">One-line summary of what the robot does.</p>
+      <div className="mt-10">
+        <DemoVideo src="/assets/walk_demo.mp4" caption="What the clip shows." />
+      </div>
+    </main>
+  )
+}
+`
+
+export function NewPageForm({ onDone }: { onDone: () => void }) {
+  const [slug, setSlug] = useState('')
+  const [code, setCode] = useState(PAGE_TEMPLATE)
+  const { pending, errors, submit } = useFormSubmit(onDone)
+  const aria = (key: string) => ({ 'aria-invalid': Boolean(errors[key]), 'aria-describedby': errors[key] ? `${key}-error` : undefined })
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        submit(() => createDemoPage(slug, code), `Page created at /showcase/${slug}`)
+      }}
+      className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+    >
+      <Field label="Slug (URL)" name="slug" error={errors.slug} hint={`Page will be at /showcase/${slug || 'your-slug'}`}>
+        <input id="slug" className={inputClass} value={slug} onChange={(e) => setSlug(e.target.value)} {...aria('slug')} />
+      </Field>
+      <Field
+        label="Page code (TypeScript / TSX)"
+        name="code"
+        error={errors.code}
+        hint="Saved as src/app/(public)/showcase/<slug>/page.tsx. Only works when running locally with pnpm run dev — commit the new file to publish it."
+      >
+        <textarea
+          id="code"
+          rows={24}
+          spellCheck={false}
+          className={`${inputClass} font-mono text-xs`}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          {...aria('code')}
+        />
+      </Field>
+      <FormButtons pending={pending} onCancel={onDone} label="Create page" />
+    </form>
+  )
+}
 
 export function DemoForm({ initial, onDone }: { initial?: AdminDemoView; onDone: () => void }) {
   const [values, setValues] = useState<Required<DemoFormInput>>({

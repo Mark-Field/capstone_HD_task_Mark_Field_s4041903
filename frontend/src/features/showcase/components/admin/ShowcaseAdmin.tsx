@@ -9,7 +9,7 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { cn } from '@/lib/utils'
 import { setDemoPublished, setMediaPublished, softDeleteDemo, softDeleteMedia } from '../../actions/showcase.actions'
 import type { AdminDemoView, FormActionResult } from '../../types'
-import { DemoForm, MediaForm } from './ShowcaseForms'
+import { DemoForm, MediaForm, NewPageForm } from './ShowcaseForms'
 
 type Editing =
   | { kind: 'new-demo' }
@@ -54,14 +54,14 @@ export function ShowcaseAdmin({ demos }: { demos: AdminDemoView[] }) {
   return (
     <div className="space-y-6">
       {editing?.kind === 'new-demo' ? (
-        <DemoForm onDone={close} />
+        <NewPageForm onDone={close} />
       ) : (
         <button
           type="button"
           onClick={() => setEditing({ kind: 'new-demo' })}
           className="inline-flex items-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-black"
         >
-          <Plus className="h-4 w-4" /> New demo
+          <Plus className="h-4 w-4" /> New demo page
         </button>
       )}
 

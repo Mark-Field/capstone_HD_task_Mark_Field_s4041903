@@ -74,6 +74,7 @@ Everything a feature build needs already exists below. **Do not survey the codeb
 | `frontend/src/features/showcase/components/DemoVideo.tsx` | `DemoVideo { src, caption }` (no autoplay, fallback on error); siblings `DemoEmbed`, `DemoImage`, `MediaItem`, `DemoCard`, `DemoBadges`, `DemoSections`, `admin/ShowcaseAdmin` | Showcase UI |
 | `frontend/src/features/showcase/lib/` | `queries.ts` (`listPublishedDemos`, `getPublishedDemo`, `listDemosForAdmin`), `admin.ts` (`getAdminUid`), `parseMediaSource.ts`, `sections.ts`, `ordering.ts` | Showcase data + validation |
 | `frontend/src/features/showcase/actions/showcase.actions.ts` | `createDemo`, `updateDemo`, `setDemoPublished`, `softDeleteDemo`, `createMedia`, `updateMedia`, `setMediaPublished`, `softDeleteMedia` | Admin-only writes |
+| `frontend/src/features/showcase/actions/demo-page.actions.ts` | `createDemoPage(slug, code)` — writes `app/(public)/showcase/<slug>/page.tsx`; dev-only | Admin "New demo page" code form |
 | `frontend/src/components/shared/` | `ErrorBoundary`, `LoadingSpinner`, `FullPageSpinner`, `EmptyState { title, description?, icon?, action? }` | Loading/empty/error states |
 | `frontend/src/app/api/auth/session/route.ts` | POST (token → `__session` cookie), DELETE | Already wired — don't touch for features |
 
