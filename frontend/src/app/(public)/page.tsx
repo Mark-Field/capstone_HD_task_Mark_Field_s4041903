@@ -30,13 +30,21 @@ export default function LandingPage() {
             service tasks — walking, navigating, perceiving and deciding. This site shows our progress
             through short demos and plain-language explanations.
           </p>
-          <Link
-            href="/showcase/walk-demo"
-            className="group mt-10 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-brand/30 transition hover:bg-brand/90"
-          >
-            Watch the walk demo
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/showcase/walk-demo"
+              className="group inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-brand/30 transition hover:bg-brand/90"
+            >
+              Watch the walk demo
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <Link
+              href="/showcase"
+              className="rounded-full border border-white/15 px-7 py-3 text-sm font-semibold text-zinc-200 transition hover:border-white/40"
+            >
+              Browse all demos
+            </Link>
+          </div>
         </div>
       </section>
 

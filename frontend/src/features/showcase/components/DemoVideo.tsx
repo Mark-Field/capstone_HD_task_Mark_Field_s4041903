@@ -17,13 +17,13 @@ export function DemoVideo({ src, caption }: DemoVideoProps) {
         <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 p-6 text-center">
           <VideoOff className="h-8 w-8 text-zinc-500" />
           <p className="text-sm text-zinc-300">This video couldn&apos;t be loaded.</p>
-          <a href={src} className="text-sm font-medium text-brand underline-offset-4 hover:underline">
+          <a href={encodeURI(src)} className="text-sm font-medium text-brand underline-offset-4 hover:underline">
             Open the video file directly
           </a>
         </div>
       ) : (
         <video
-          src={src}
+          src={encodeURI(src)}
           controls
           playsInline
           preload="metadata"

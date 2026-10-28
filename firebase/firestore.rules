@@ -56,6 +56,24 @@ service cloud.firestore {
       allow delete: if false; // soft-delete only — set deletedAt field instead
     }
 
+    // Published and not soft-deleted.
+    function isLive() {
+      return resource.data.published == true && notDeleted();
+    }
+
+    // demos/{slug} and media/{mediaId}
+    // Public may read live content; admins may read drafts. All writes go through
+    // Server Actions (Admin SDK), so client writes are always denied.
+    match /demos/{demoId} {
+      allow read: if isLive() || isAdmin();
+      allow write: if false;
+    }
+
+    match /media/{mediaId} {
+      allow read: if isLive() || isAdmin();
+      allow write: if false;
+    }
+
     // Add new collection rules above this comment using the /firebase-collection skill.
 
     // ── Default deny ───────────────────────────────────────────────────────
