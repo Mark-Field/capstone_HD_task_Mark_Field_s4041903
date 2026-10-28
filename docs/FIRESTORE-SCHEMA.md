@@ -46,4 +46,44 @@ This enables **lazy migration** — when a document is read, check `_schemaVersi
 
 ---
 
+## `demos` collection
+
+**Path:** `/demos/{slug}` (document ID is the URL slug)
+**Access:** Public read when `published == true` and not deleted; admins read all. All client writes denied — writes go through Server Actions in `frontend/src/features/showcase/actions/` (Admin SDK + `getAdminUid()` role check).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | `string` | Yes | Display title |
+| `capability` | `string` | Yes | e.g. "Locomotion" |
+| `summary` | `string` | Yes | One or two sentences shown on the card |
+| `status` | `'working' \| 'partial' \| 'planned'` | Yes | Honest status label |
+| `environment` | `'simulation' \| 'physical'` | Yes | Where it was demonstrated |
+| `sprint` | `number` | Yes | Primary sort key |
+| `order` | `number` | Yes | Secondary sort key within a sprint |
+| `sections` | `{ heading, paragraphs?, bullets?, steps? }[]` | Yes | Explanation body |
+| `published` | `boolean` | Yes | Public visibility |
+| `createdBy` | `string` | Yes | Admin UID (or `seed-script`) |
+| `createdAt` / `updatedAt` | `Timestamp` | Yes | |
+| `deletedAt` | `Timestamp \| null` | Yes | Soft delete — always written as `null` on create |
+| `_schemaVersion` | `1` | Yes | |
+
+## `media` collection
+
+**Path:** `/media/{mediaId}`
+**Access:** Same as `demos`. A media item can only be published while its parent demo is published and not deleted (enforced in `setMediaPublished`).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `demoId` | `string` | Yes | Slug of the parent demo |
+| `type` | `'video' \| 'image'` | Yes | |
+| `provider` | `'local' \| 'youtube' \| 'vimeo'` | Yes | Derived server-side by `parseMediaSource()` |
+| `src` | `string` | Yes | `/assets/...` path for local files, otherwise the provider's video ID (raw URLs are never stored) |
+| `caption` | `string` | Yes | |
+| `alt` | `string \| null` | Yes | Required for images |
+| `order` | `number` | Yes | Display order within the demo |
+| `published` | `boolean` | Yes | |
+| `createdBy`, `createdAt`, `updatedAt`, `deletedAt`, `_schemaVersion` | | Yes | As for `demos` |
+
+**Seeding:** `pnpm --filter frontend seed:showcase` loads the current demos (idempotent, fixed IDs).
+
 <!-- Add new collection schemas below using the /firebase-collection skill -->
